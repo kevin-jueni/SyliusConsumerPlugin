@@ -5,11 +5,25 @@ declare(strict_types=1);
 namespace Sylake\SyliusConsumerPlugin\Denormalizer;
 
 use PhpAmqpLib\Message\AMQPMessage;
+use Psr\Log\LoggerInterface;
 use SyliusLabs\RabbitMqSimpleBusBundle\Denormalizer\DenormalizationFailedException;
 use SyliusLabs\RabbitMqSimpleBusBundle\Denormalizer\DenormalizerInterface;
 
 abstract class AkeneoDenormalizer implements DenormalizerInterface
 {
+    /**
+     * @var LoggerInterface|null
+     */
+    protected $logger;
+
+    /**
+     * @param null|LoggerInterface $logger
+     */
+    public function __construct(?LoggerInterface $logger = null)
+    {
+        $this->logger = $logger;
+    }
+
     /**
      * {@inheritdoc}
      */

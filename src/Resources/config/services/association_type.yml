@@ -1,10 +1,12 @@
 services:
     sylius_consumer_plugin.denormalizer.association_type:
         class: Sylake\SyliusConsumerPlugin\Denormalizer\AssociationTypeUpdatedDenormalizer
+        public: true
         tags:
-        - { name: rabbitmq_simplebus.amqp_denormalizer }
+            - { name: rabbitmq_simplebus.amqp_denormalizer }
     sylius_consumer_plugin.projector.association_type:
         class: Sylake\SyliusConsumerPlugin\Projector\AssociationTypeProjector
+        public: true
         tags:
-        - { name: event_subscriber, subscribes_to: Sylake\SyliusConsumerPlugin\Event\AssociationTypeUpdated, method: __invoke }
+            - { name: event_subscriber, subscribes_to: Sylake\SyliusConsumerPlugin\Event\AssociationTypeUpdated, method: __invoke }
         arguments: ['@sylius.factory.product_association_type', '@sylius.repository.product_association_type', '@monolog.logger']

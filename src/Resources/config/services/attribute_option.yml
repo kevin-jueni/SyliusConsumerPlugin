@@ -1,5 +1,5 @@
 services:
-    74aca229d9fbbe4456993aa733d2c2296aeb925e26db08879f6bdc9dede328f0_1:
+    sylius_consumer_plugin.doctrine_orm_mapping_class_metadata:
         class: Doctrine\ORM\Mapping\ClassMetadata
         public: false
         arguments: [Sylake\SyliusConsumerPlugin\Entity\AkeneoAttributeOption]
@@ -15,4 +15,4 @@ services:
         arguments: ['@sylake_sylius_consumer.repository.akeneo_attribute_option', '@monolog.logger']
     sylake_sylius_consumer.repository.akeneo_attribute_option:
         class: Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository
-        arguments: ['@doctrine.orm.default_entity_manager', '@74aca229d9fbbe4456993aa733d2c2296aeb925e26db08879f6bdc9dede328f0_1']
+        arguments: ['@doctrine.orm.default_entity_manager', '@sylius_consumer_plugin.doctrine_orm_mapping_class_metadata']

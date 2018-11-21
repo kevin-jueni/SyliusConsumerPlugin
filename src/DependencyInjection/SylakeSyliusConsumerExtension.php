@@ -20,7 +20,7 @@ final class SylakeSyliusConsumerExtension extends Extension implements PrependEx
         $config = $this->processConfiguration($this->getConfiguration([], $container), $config);
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
 
-        $loader->load('services.xml');
+        $loader->load('services.yml');
 
         $container->setParameter(
             'sylake_sylius_consumer.denormalizer.product.name_attribute',

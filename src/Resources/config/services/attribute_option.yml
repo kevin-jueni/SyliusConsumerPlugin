@@ -1,0 +1,18 @@
+services:
+    74aca229d9fbbe4456993aa733d2c2296aeb925e26db08879f6bdc9dede328f0_1:
+        class: Doctrine\ORM\Mapping\ClassMetadata
+        public: false
+        arguments: [Sylake\SyliusConsumerPlugin\Entity\AkeneoAttributeOption]
+        factory: ['@doctrine.orm.default_entity_manager', getClassMetadata]
+    sylius_consumer_plugin.denormalizer.attribute_option:
+        class: Sylake\SyliusConsumerPlugin\Denormalizer\AttributeOptionUpdatedDenormalizer
+        tags:
+        - { name: rabbitmq_simplebus.amqp_denormalizer }
+    sylius_consumer_plugin.projector.attribute_option:
+        class: Sylake\SyliusConsumerPlugin\Projector\AttributeOptionProjector
+        tags:
+        - { name: event_subscriber, subscribes_to: Sylake\SyliusConsumerPlugin\Event\AttributeOptionUpdated, method: __invoke }
+        arguments: ['@sylake_sylius_consumer.repository.akeneo_attribute_option', '@monolog.logger']
+    sylake_sylius_consumer.repository.akeneo_attribute_option:
+        class: Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository
+        arguments: ['@doctrine.orm.default_entity_manager', '@74aca229d9fbbe4456993aa733d2c2296aeb925e26db08879f6bdc9dede328f0_1']

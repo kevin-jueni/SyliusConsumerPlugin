@@ -1,0 +1,8 @@
+imports:
+    - 'services/association_type.yml'
+    - 'services/attribute.yml'
+    - 'services/attribute_option.yml'
+    - 'services/family.yml'
+    - 'services/group.yml'
+    - 'services/product.yml'
+    - 'services/taxon.yml'

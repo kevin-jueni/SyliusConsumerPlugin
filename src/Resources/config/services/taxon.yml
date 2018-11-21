@@ -1,0 +1,10 @@
+services:
+    sylius_consumer_plugin.denormalizer.taxon:
+        class: Sylake\SyliusConsumerPlugin\Denormalizer\TaxonUpdatedDenormalizer
+        tags:
+        - { name: rabbitmq_simplebus.amqp_denormalizer }
+    sylius_consumer_plugin.projector.taxon:
+        class: Sylake\SyliusConsumerPlugin\Projector\TaxonProjector
+        tags:
+        - { name: event_subscriber, subscribes_to: Sylake\SyliusConsumerPlugin\Event\TaxonUpdated, method: __invoke }
+        arguments: ['@sylius.factory.taxon', '@sylius.repository.taxon', '@sylius.generator.taxon_slug', '@monolog.logger']

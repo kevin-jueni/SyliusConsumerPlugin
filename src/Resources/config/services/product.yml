@@ -1,0 +1,70 @@
+services:
+    c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_9:
+        class: Sylake\SyliusConsumerPlugin\Projector\Product\Attribute\UnitAttributeProcessor
+        public: false
+        arguments: ['@sylake_sylius_consumer.attribute.attribute_value_provider']
+    c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_8:
+        class: Sylake\SyliusConsumerPlugin\Projector\Product\Attribute\ImageAttributeProcessor
+        public: false
+        arguments: ['@sylius.factory.product_image', '@sylius.repository.product_image', '%sylake_sylius_consumer.denormalizer.product.image_attribute%']
+    c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_7:
+        class: Sylake\SyliusConsumerPlugin\Projector\Product\Attribute\ChannelPricingAttributeProcessor
+        public: false
+        arguments: ['@sylius.factory.channel_pricing', '@sylius.repository.channel', '@sylius.repository.currency', '@sylius.repository.channel_pricing', '%sylake_sylius_consumer.denormalizer.product.price_attribute%']
+    c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_6:
+        class: Sylake\SyliusConsumerPlugin\Projector\Product\Attribute\ChannelAttributeProcessor
+        public: false
+        arguments: ['@sylius.repository.channel', '@sylius.repository.currency', '%sylake_sylius_consumer.denormalizer.product.price_attribute%']
+    c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_5:
+        class: Sylake\SyliusConsumerPlugin\Projector\Product\Attribute\DescriptionAttributeProcessor
+        public: false
+        arguments: ['%sylake_sylius_consumer.denormalizer.product.description_attribute%']
+    c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_4:
+        class: Sylake\SyliusConsumerPlugin\Projector\Product\Attribute\NameAttributeProcessor
+        public: false
+        arguments: ['%sylake_sylius_consumer.denormalizer.product.name_attribute%']
+    c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_3:
+        class: Sylake\SyliusConsumerPlugin\Projector\Product\ProductAssociationProjector
+        public: false
+        arguments: ['@sylius.factory.product_association', '@sylius.repository.product', '@sylius.repository.product_association_type', '@sylius.repository.product_association']
+    c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_2:
+        class: Sylake\SyliusConsumerPlugin\Projector\Product\ProductAttributeProjector
+        public: false
+        arguments: ['@sylius.repository.locale', '@sylake_sylius_consumer.attribute.attribute_processor']
+    c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_12:
+        class: Sylake\SyliusConsumerPlugin\Projector\Product\Attribute\ScalarAttributeProcessor
+        public: false
+        arguments: ['@sylake_sylius_consumer.attribute.attribute_value_provider', '@sylake_sylius_consumer.attribute.attribute_option_resolver']
+    c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_11:
+        class: Sylake\SyliusConsumerPlugin\Projector\Product\Attribute\DateAttributeProcessor
+        public: false
+        arguments: ['@sylake_sylius_consumer.attribute.attribute_value_provider']
+    c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_10:
+        class: Sylake\SyliusConsumerPlugin\Projector\Product\Attribute\StringCollectionAttributeProcessor
+        public: false
+        arguments: ['@sylake_sylius_consumer.attribute.attribute_value_provider', '@sylake_sylius_consumer.attribute.attribute_option_resolver']
+    c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_1:
+        class: Sylake\SyliusConsumerPlugin\Projector\Product\ProductTaxonProjector
+        public: false
+        arguments: ['@sylius.factory.product_taxon', '@sylius.repository.product_taxon', '@sylius.repository.taxon']
+    sylius_consumer_plugin.denormalizer.product:
+        class: Sylake\SyliusConsumerPlugin\Denormalizer\ProductUpdatedDenormalizer
+        tags:
+        - { name: rabbitmq_simplebus.amqp_denormalizer }
+    sylake_sylius_consumer.projector.product:
+        class: Sylake\SyliusConsumerPlugin\Projector\ProductProjector
+        tags:
+        - { name: event_subscriber, subscribes_to: Sylake\SyliusConsumerPlugin\Event\ProductUpdated, method: __invoke }
+        arguments: ['@sylius.factory.product', '@sylake_sylius_consumer.projector.product_slug_generator', '@sylius.repository.product', '@c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_1', '@c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_2', '@c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_3', '@monolog.logger']
+    sylake_sylius_consumer.projector.product_slug_generator:
+        class: Sylake\SyliusConsumerPlugin\Projector\Product\ProductSlugGenerator
+        arguments: ['@sylius.generator.slug']
+    sylake_sylius_consumer.attribute.attribute_option_resolver:
+        class: Sylake\SyliusConsumerPlugin\Projector\Product\Attribute\AttributeOptionResolver
+        arguments: ['@sylake_sylius_consumer.repository.akeneo_attribute_option']
+    sylake_sylius_consumer.attribute.attribute_value_provider:
+        class: Sylake\SyliusConsumerPlugin\Projector\Product\Attribute\AttributeValueProvider
+        arguments: ['@sylius.factory.product_attribute_value', '@sylius.repository.product_attribute', '@sylius.repository.product_attribute_value']
+    sylake_sylius_consumer.attribute.attribute_processor:
+        class: Sylake\SyliusConsumerPlugin\Projector\Product\Attribute\CompositeAttributeProcessor
+        arguments: ['@c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_4', '@c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_5', '@c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_6', '@c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_7', '@c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_8', '@c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_9', '@c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_10', '@c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_11', '@c721ea6805a8073eec7e8e6a49c456ad429223475326f99ecc573a911b12de7a_12']

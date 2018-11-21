@@ -14,6 +14,11 @@ final class FamilyUpdatedDenormalizer extends AkeneoDenormalizer
      */
     protected function denormalizePayload(array $payload)
     {
+        if ($this->logger) {
+            $this->logger->debug(sprintf('Denormalizing family "%s" with the following payload: "%s"',
+                $payload['code'], json_encode($payload)));
+        }
+
         return new FamilyUpdated($payload['code'], new Translations($payload['labels']));
     }
 

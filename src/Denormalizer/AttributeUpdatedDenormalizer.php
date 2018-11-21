@@ -14,6 +14,11 @@ final class AttributeUpdatedDenormalizer extends AkeneoDenormalizer
      */
     protected function denormalizePayload(array $payload)
     {
+        if ($this->logger) {
+            $this->logger->debug(sprintf('Denormalizing attribute "%s" with the following payload: "%s"',
+                $payload['code'], json_encode($payload)));
+        }
+
         return new AttributeUpdated($payload['code'], $payload['type'], new Translations($payload['labels']));
     }
 

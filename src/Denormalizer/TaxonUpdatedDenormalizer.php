@@ -14,6 +14,11 @@ final class TaxonUpdatedDenormalizer extends AkeneoDenormalizer
      */
     protected function denormalizePayload(array $payload)
     {
+        if ($this->logger) {
+            $this->logger->debug(sprintf('Denormalizing taxon "%s" with the following payload: "%s"', $payload['code'],
+                json_encode($payload)));
+        }
+
         return new TaxonUpdated($payload['code'], $payload['parent'], new Translations($payload['labels']));
     }
 

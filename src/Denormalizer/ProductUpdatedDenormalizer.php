@@ -18,6 +18,11 @@ final class ProductUpdatedDenormalizer extends AkeneoDenormalizer
             throw new DenormalizationFailedException('Identifier should be a string.');
         }
 
+        if ($this->logger) {
+            $this->logger->debug(sprintf('Denormalizing product "%s" with the following payload: "%s"',
+                $payload['identifier'], json_encode($payload)));
+        }
+
         $payload['enabled'] = $payload['enabled'] ?? false;
         if (!is_bool($payload['enabled'])) {
             throw new DenormalizationFailedException('Enabled should be a boolean.');

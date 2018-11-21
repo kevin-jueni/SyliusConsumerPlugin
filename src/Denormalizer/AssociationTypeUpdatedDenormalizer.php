@@ -14,6 +14,11 @@ final class AssociationTypeUpdatedDenormalizer extends AkeneoDenormalizer
      */
     protected function denormalizePayload(array $payload)
     {
+        if ($this->logger) {
+            $this->logger->debug(sprintf('Denormalizing association type "%s" with the following payload: "%s"',
+                $payload['code'], json_encode($payload)));
+        }
+
         return new AssociationTypeUpdated($payload['code'], new Translations($payload['labels']));
     }
 

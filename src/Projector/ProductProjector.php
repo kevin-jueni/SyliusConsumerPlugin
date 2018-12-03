@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sylake\SyliusConsumerPlugin\Projector;
 
+use App\Cloudtec\Bundle\SyliusBundle\Entity\ProductInterface;
 use Psr\Log\LoggerInterface;
 use Sylake\SyliusConsumerPlugin\Event\ProductUpdated;
 use Sylake\SyliusConsumerPlugin\Projector\Product\ProductAssociationProjector;
@@ -11,7 +12,6 @@ use Sylake\SyliusConsumerPlugin\Projector\Product\ProductAttributeProjector;
 use Sylake\SyliusConsumerPlugin\Projector\Product\ProductPostprocessorInterface;
 use Sylake\SyliusConsumerPlugin\Projector\Product\ProductSlugGeneratorInterface;
 use Sylake\SyliusConsumerPlugin\Projector\Product\ProductTaxonProjector;
-use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductTranslationInterface;
 use Sylius\Component\Product\Factory\ProductFactoryInterface;
 use Sylius\Component\Resource\Model\TranslationInterface;
@@ -94,10 +94,18 @@ final class ProductProjector
         $this->handleEnabled($event->enabled(), $product);
         $this->handleCreatedAt($event->createdAt(), $product);
         $this->handleSlug($product);
+        $this->handleParentCode($event->getParentCode(), $product);
 
         $this->handlePostprocessors($event, $product);
 
         $this->productRepository->add($product);
+    }
+
+    private function handleParentCode(?string $parentCode, ProductInterface $product): void
+    {
+        if ($parentCode) {
+            $product->setParentCode($parentCode);
+        }
     }
 
     private function handleEnabled(bool $enabled, ProductInterface $product): void
@@ -121,7 +129,8 @@ final class ProductProjector
     {
         foreach ($product->getTranslations() as $productTranslation) {
             /** @var ProductTranslationInterface|TranslationInterface $productTranslation */
-            $productTranslation->setSlug($this->productSlugGenerator->generate($product, $productTranslation->getLocale()));
+            $productTranslation->setSlug($this->productSlugGenerator->generate($product,
+                $productTranslation->getLocale()));
         }
     }
 

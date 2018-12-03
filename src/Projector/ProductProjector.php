@@ -13,7 +13,9 @@ use Sylake\SyliusConsumerPlugin\Projector\Product\ProductSlugGeneratorInterface;
 use Sylake\SyliusConsumerPlugin\Projector\Product\ProductTaxonProjector;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductTranslationInterface;
+use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Product\Factory\ProductFactoryInterface;
+use Sylius\Component\Product\Factory\ProductVariantFactoryInterface;
 use Sylius\Component\Resource\Model\TranslationInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 
@@ -23,6 +25,11 @@ final class ProductProjector
      * @var ProductFactoryInterface
      */
     private $productFactory;
+
+    /**
+     * @var ProductVariantFactoryInterface
+     */
+    private $productVariantFactory;
 
     /**
      * @var ProductSlugGeneratorInterface
@@ -61,6 +68,7 @@ final class ProductProjector
 
     public function __construct(
         ProductFactoryInterface $productFactory,
+        ProductVariantFactoryInterface $productVariantFactory,
         ProductSlugGeneratorInterface $productSlugGenerator,
         RepositoryInterface $productRepository,
         ProductTaxonProjector $productTaxonProjector,
@@ -69,6 +77,7 @@ final class ProductProjector
         LoggerInterface $logger
     ) {
         $this->productFactory = $productFactory;
+        $this->productVariantFactory = $productVariantFactory;
         $this->productSlugGenerator = $productSlugGenerator;
         $this->productRepository = $productRepository;
         $this->productTaxonProjector = $productTaxonProjector;
@@ -86,7 +95,7 @@ final class ProductProjector
     {
         $this->logger->debug(sprintf('Projecting product with code "%s".', $event->code()));
 
-        $product = $this->provideProduct($event->code());
+        $product = $this->provideProduct($event->code(), $event->getParentCode());
 
         ($this->productTaxonProjector)($event, $product);
         ($this->productAttributeProjector)($event, $product);
@@ -94,6 +103,12 @@ final class ProductProjector
         $this->handleEnabled($event->enabled(), $product);
         $this->handleCreatedAt($event->createdAt(), $product);
         $this->handleSlug($product);
+
+        if ($event->getParentCode() !== null) {
+            $variant = $this->getProductVariant($event->getCode(), $product);
+            $variant->setName($event->getCode());
+
+        }
 
         $this->handlePostprocessors($event, $product);
 
@@ -121,24 +136,64 @@ final class ProductProjector
     {
         foreach ($product->getTranslations() as $productTranslation) {
             /** @var ProductTranslationInterface|TranslationInterface $productTranslation */
-            $productTranslation->setSlug($this->productSlugGenerator->generate($product, $productTranslation->getLocale()));
+            $productTranslation->setSlug($this->productSlugGenerator->generate($product,
+                $productTranslation->getLocale()));
         }
     }
 
-    private function provideProduct(string $code): ProductInterface
+    private function provideProduct(string $code, ?string $parentCode = null): ProductInterface
     {
-        /** @var ProductInterface|null $product */
-        $product = $this->productRepository->findOneBy(['code' => $code]);
+        if ($parentCode !== null) {
+            $parentProduct = $this->provideParentProduct($parentCode);
 
-        if (null === $product) {
-            $product = $this->productFactory->createWithVariant();
-            $product->setCode($code);
+            $productVariant = null;
 
-            $productVariant = current($product->getVariants()->slice(0, 1));
-            $productVariant->setCode($code);
+            $productVariant = $this->getProductVariant($code, $parentProduct);
+
+            if ($productVariant === null) {
+                /** @var ProductVariantInterface $productVariant */
+                $productVariant = $this->productVariantFactory->createNew();
+                $productVariant->setCode($code);
+                $parentProduct->addVariant($productVariant);
+            }
+
+            return $parentProduct;
+
+        } else {
+            /** @var ProductInterface|null $product */
+            $product = $this->productRepository->findOneBy(['code' => $code]);
+
+            if (null === $product) {
+                $product = $this->productFactory->createWithVariant();
+                $product->setCode($code);
+            }
+
+            return $product;
+        }
+    }
+
+    private function provideParentProduct(string $parentCode): ProductInterface
+    {
+        /** @var ProductInterface|null $parentProduct */
+        $parentProduct = $this->productRepository->findOneBy(['code' => $parentCode]);
+
+        if ($parentProduct === null) {
+            $parentProduct = $this->productFactory->createNew();
+            $parentProduct->setCode($parentCode);
         }
 
-        return $product;
+        return $parentProduct;
+    }
+
+    private function getProductVariant(string $code, ProductInterface $product): ?ProductVariantInterface
+    {
+        foreach ($product->getVariants() as &$variant) {
+            if ($variant->getCode() === $code) {
+                return $variant;
+            }
+        }
+
+        return null;
     }
 
     private function handlePostprocessors(ProductUpdated $event, ProductInterface $product): void

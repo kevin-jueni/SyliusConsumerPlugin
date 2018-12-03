@@ -48,6 +48,12 @@ final class ProductUpdatedDenormalizer extends AkeneoDenormalizer
             throw new DenormalizationFailedException('Created should be a string or null.');
         }
 
+        $payload['parent'] = $payload['parent'] ?? null;
+
+        if (null !== $payload['parent'] && !is_string($payload['parent'])) {
+            throw new DenormalizationFailedException('Parent should be a string or null.');
+        }
+
         return new ProductUpdated(
             $payload['identifier'],
             $payload['enabled'],
@@ -56,7 +62,8 @@ final class ProductUpdatedDenormalizer extends AkeneoDenormalizer
             $this->getAssociations($payload),
             $payload['family'] ?? '',
             array_values($payload['groups'] ?? []),
-            \DateTime::createFromFormat(\DateTime::ATOM, $payload['created']) ?: null
+            \DateTime::createFromFormat(\DateTime::ATOM, $payload['created']) ?: null,
+            $payload['parent']
         );
     }
 

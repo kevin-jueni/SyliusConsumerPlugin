@@ -57,7 +57,7 @@ services:
         public: true
         tags:
             - { name: event_subscriber, subscribes_to: Sylake\SyliusConsumerPlugin\Event\ProductUpdated, method: __invoke }
-        arguments: ['@sylius.factory.product', '@sylake_sylius_consumer.projector.product_slug_generator', '@sylius.repository.product', '@sylake_sylius_consumer.projector.product.product_taxon_projector', '@sylake_sylius_consumer.projector.product.product_attribute_projector', '@sylake_sylius_consumer.projector.product.product_association_projector', '@monolog.logger.queue']
+        arguments: ['@sylius.factory.product', '@sylius.factory.product_variant', '@sylake_sylius_consumer.projector.product_slug_generator', '@sylius.repository.product', '@sylake_sylius_consumer.projector.product.product_taxon_projector', '@sylake_sylius_consumer.projector.product.product_attribute_projector', '@sylake_sylius_consumer.projector.product.product_association_projector', '@monolog.logger.queue']
     sylake_sylius_consumer.projector.product_slug_generator:
         class: Sylake\SyliusConsumerPlugin\Projector\Product\ProductSlugGenerator
         arguments: ['@sylius.generator.slug']

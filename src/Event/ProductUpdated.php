@@ -46,6 +46,11 @@ final class ProductUpdated
      */
     private $groups;
 
+    /**
+     * @var null|string
+     */
+    private $parentCode;
+
     public function __construct(
         string $code,
         bool $enabled,
@@ -54,7 +59,8 @@ final class ProductUpdated
         array $associations,
         ?string $family,
         array $groups,
-        ?\DateTime $createdAt
+        ?\DateTime $createdAt,
+        ?string $parentCode = null
     ) {
         $this->code = $code;
         $this->enabled = $enabled;
@@ -64,6 +70,7 @@ final class ProductUpdated
         $this->family = $family;
         $this->groups = $groups;
         $this->createdAt = $createdAt;
+        $this->parentCode = $parentCode;
     }
 
     public function code(): string
@@ -104,5 +111,13 @@ final class ProductUpdated
     public function createdAt(): ?\DateTime
     {
         return $this->createdAt;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getParentCode(): ?string
+    {
+        return $this->parentCode;
     }
 }

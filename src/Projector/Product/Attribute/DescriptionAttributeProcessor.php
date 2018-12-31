@@ -34,6 +34,6 @@ final class DescriptionAttributeProcessor implements AttributeProcessorInterface
 
     private function supports(Attribute $attribute): bool
     {
-        return $this->descriptionAttribute === $attribute->attribute() && is_string($attribute->data());
+        return strpos($attribute->attribute(), $this->descriptionAttribute) === 0 && is_string($attribute->data());
     }
 }

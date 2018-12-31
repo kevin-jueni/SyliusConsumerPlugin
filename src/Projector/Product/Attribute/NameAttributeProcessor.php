@@ -34,6 +34,7 @@ final class NameAttributeProcessor implements AttributeProcessorInterface
 
     private function supports(Attribute $attribute): bool
     {
-        return $this->nameAttribute === $attribute->attribute() && (is_string($attribute->data()) || null === $attribute->data());
+        return strpos($attribute->attribute(),
+                $this->nameAttribute) === 0 && (is_string($attribute->data()) || null === $attribute->data());
     }
 }

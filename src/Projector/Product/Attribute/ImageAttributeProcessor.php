@@ -68,7 +68,8 @@ final class ImageAttributeProcessor implements AttributeProcessorInterface
 
     private function supports(Attribute $attribute): bool
     {
-        return $this->imageAttribute === $attribute->attribute() && (null === $attribute->data() || is_string($attribute->data()));
+        return strpos($attribute->attribute(),
+                $this->imageAttribute) === 0 && (null === $attribute->data() || is_string($attribute->data()));
     }
 
     private function processImages(ProductInterface $product, Attribute $attribute): array

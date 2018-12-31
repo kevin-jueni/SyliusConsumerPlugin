@@ -94,17 +94,19 @@ final class ProductProjector
         $this->handleEnabled($event->enabled(), $product);
         $this->handleCreatedAt($event->createdAt(), $product);
         $this->handleSlug($product);
-        $this->handleParentCode($event->getParentCode(), $product);
+        $this->handleParentCode($event->getParentCode(), $product, $event->getCode());
 
         $this->handlePostprocessors($event, $product);
 
         $this->productRepository->add($product);
     }
 
-    private function handleParentCode(?string $parentCode, ProductInterface $product): void
+    private function handleParentCode(?string $parentCode, ProductInterface $product, string $code): void
     {
         if ($parentCode) {
             $product->setParentCode($parentCode);
+        } else {
+            $product->setParentCode($code);
         }
     }
 
@@ -153,7 +155,7 @@ final class ProductProjector
     private function handlePostprocessors(ProductUpdated $event, ProductInterface $product): void
     {
         foreach ($this->postprocessors as $postprocessor) {
-            $postprocessor($event, $product);
+            $product = $postprocessor($event, $product);
         }
     }
 }

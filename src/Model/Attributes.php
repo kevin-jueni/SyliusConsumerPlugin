@@ -26,9 +26,13 @@ final class Attributes implements \IteratorAggregate
                 continue;
             }
 
-            /** @var array $attributeValues */
-            foreach ($attributeValues as $attributeValue) {
-                yield from $this->generateLocalisedAttributes($attributeCode, $attributeValue);
+            if (array_key_exists('locale', $attributeValues) === false) {
+                /** @var array $attributeValues */
+                foreach ($attributeValues as $attributeValue) {
+                    yield from $this->generateLocalisedAttributes($attributeCode, $attributeValue);
+                }
+            } else {
+                yield from $this->generateLocalisedAttributes($attributeCode, $attributeValues);
             }
         }
     }

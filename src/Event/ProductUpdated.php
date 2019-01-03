@@ -32,6 +32,11 @@ final class ProductUpdated
     private $associations;
 
     /**
+     * @var array
+     */
+    private $assets;
+
+    /**
      * @var ?\DateTime
      */
     private $createdAt;
@@ -57,6 +62,7 @@ final class ProductUpdated
         array $taxons,
         array $attributes,
         array $associations,
+        array $assets,
         ?string $family,
         array $groups,
         ?\DateTime $createdAt,
@@ -67,6 +73,7 @@ final class ProductUpdated
         $this->taxons = $taxons;
         $this->attributes = $attributes;
         $this->associations = $associations;
+        $this->assets = $assets;
         $this->family = $family;
         $this->groups = $groups;
         $this->createdAt = $createdAt;
@@ -98,6 +105,11 @@ final class ProductUpdated
         return $this->associations;
     }
 
+    public function assets(): array
+    {
+        return $this->assets;
+    }
+
     public function family(): ?string
     {
         return $this->family;
@@ -118,6 +130,6 @@ final class ProductUpdated
      */
     public function getParentCode(): ?string
     {
-        return $this->parentCode;
+        return $this->parentCode ? $this->parentCode : $this->code;
     }
 }

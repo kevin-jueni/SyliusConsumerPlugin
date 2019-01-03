@@ -60,6 +60,7 @@ final class ProductUpdatedDenormalizer extends AkeneoDenormalizer
             $payload['categories'],
             $payload['values'],
             $this->getAssociations($payload),
+            $this->getAssets($payload),
             $payload['family'] ?? '',
             array_values($payload['groups'] ?? []),
             \DateTime::createFromFormat(\DateTime::ATOM, $payload['created']) ?: null,
@@ -83,5 +84,27 @@ final class ProductUpdatedDenormalizer extends AkeneoDenormalizer
         }
 
         return $associations;
+    }
+
+    /**
+     * @param array $payload
+     * @return array
+     */
+    private function getAssets(array $payload): array
+    {
+        $assets = [];
+
+        if (array_key_exists('images', $payload['values']) === false || !is_array($payload['values']['images'])) {
+            throw new DenormalizationFailedException('Images should be an array.');
+        }
+
+        foreach ($payload['values']['images'] as $asset) {
+            $assets = array_merge(
+                $assets,
+                $asset['data']
+            );
+        }
+
+        return $assets;
     }
 }

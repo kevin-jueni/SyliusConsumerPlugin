@@ -7,6 +7,7 @@ namespace Sylake\SyliusConsumerPlugin\Projector;
 use App\Cloudtec\Bundle\SyliusBundle\Entity\ProductInterface;
 use Psr\Log\LoggerInterface;
 use Sylake\SyliusConsumerPlugin\Event\ProductUpdated;
+use Sylake\SyliusConsumerPlugin\Projector\Product\ProductAssetProjector;
 use Sylake\SyliusConsumerPlugin\Projector\Product\ProductAssociationProjector;
 use Sylake\SyliusConsumerPlugin\Projector\Product\ProductAttributeProjector;
 use Sylake\SyliusConsumerPlugin\Projector\Product\ProductPostprocessorInterface;
@@ -50,6 +51,11 @@ final class ProductProjector
     private $productAssociationProjector;
 
     /**
+     * @var ProductAssetProjector
+     */
+    private $productAssetProjector;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -66,6 +72,7 @@ final class ProductProjector
         ProductTaxonProjector $productTaxonProjector,
         ProductAttributeProjector $productAttributeProjector,
         ProductAssociationProjector $productAssociationProjector,
+        ProductAssetProjector $productAssetProjector,
         LoggerInterface $logger
     ) {
         $this->productFactory = $productFactory;
@@ -74,6 +81,7 @@ final class ProductProjector
         $this->productTaxonProjector = $productTaxonProjector;
         $this->productAttributeProjector = $productAttributeProjector;
         $this->productAssociationProjector = $productAssociationProjector;
+        $this->productAssetProjector = $productAssetProjector;
         $this->logger = $logger;
     }
 
@@ -91,10 +99,11 @@ final class ProductProjector
         ($this->productTaxonProjector)($event, $product);
         ($this->productAttributeProjector)($event, $product);
         ($this->productAssociationProjector)($event, $product);
+        ($this->productAssetProjector)($event, $product);
         $this->handleEnabled($event->enabled(), $product);
         $this->handleCreatedAt($event->createdAt(), $product);
         $this->handleSlug($product);
-        $this->handleParentCode($event->getParentCode(), $product, $event->getCode());
+        $this->handleParentCode($event->getParentCode(), $product, $event->code());
 
         $this->handlePostprocessors($event, $product);
 

@@ -47,17 +47,21 @@ services:
         class: Sylake\SyliusConsumerPlugin\Projector\Product\ProductTaxonProjector
         public: false
         arguments: ['@sylius.factory.product_taxon', '@sylius.repository.product_taxon', '@sylius.repository.taxon']
+    sylake_sylius_consumer.projector.product.product_asset_projector:
+        class: Sylake\SyliusConsumerPlugin\Projector\Product\ProductAssetProjector
+        public: false
+        arguments: ['@cloudtec.sylius.asset.repository']
     sylius_consumer_plugin.denormalizer.product:
         class: Sylake\SyliusConsumerPlugin\Denormalizer\ProductUpdatedDenormalizer
         tags:
-            - { name: rabbitmq_simplebus.amqp_denormalizer }
+        - { name: rabbitmq_simplebus.amqp_denormalizer }
         arguments: ['@monolog.logger.queue']
     sylake_sylius_consumer.projector.product:
         class: Sylake\SyliusConsumerPlugin\Projector\ProductProjector
         public: true
         tags:
-            - { name: event_subscriber, subscribes_to: Sylake\SyliusConsumerPlugin\Event\ProductUpdated, method: __invoke }
-        arguments: ['@sylius.factory.product', '@sylake_sylius_consumer.projector.product_slug_generator', '@sylius.repository.product', '@sylake_sylius_consumer.projector.product.product_taxon_projector', '@sylake_sylius_consumer.projector.product.product_attribute_projector', '@sylake_sylius_consumer.projector.product.product_association_projector', '@monolog.logger.queue']
+        - { name: event_subscriber, subscribes_to: Sylake\SyliusConsumerPlugin\Event\ProductUpdated, method: __invoke }
+        arguments: ['@sylius.factory.product', '@sylake_sylius_consumer.projector.product_slug_generator', '@sylius.repository.product', '@sylake_sylius_consumer.projector.product.product_taxon_projector', '@sylake_sylius_consumer.projector.product.product_attribute_projector', '@sylake_sylius_consumer.projector.product.product_association_projector', '@sylake_sylius_consumer.projector.product.product_asset_projector', '@monolog.logger.queue']
     sylake_sylius_consumer.projector.product_slug_generator:
         class: Sylake\SyliusConsumerPlugin\Projector\Product\ProductSlugGenerator
         arguments: ['@sylius.generator.slug']

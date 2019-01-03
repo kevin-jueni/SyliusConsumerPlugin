@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Sylake\SyliusConsumerPlugin\Projector\Product\Attribute;
 
+use Gaufrette\FilesystemInterface;
+use Psr\Log\LoggerInterface;
 use Sylake\SyliusConsumerPlugin\Model\Attribute;
 use Sylius\Component\Core\Model\ProductImageInterface;
 use Sylius\Component\Core\Model\ProductInterface;
@@ -21,14 +23,36 @@ final class ImageAttributeProcessor implements AttributeProcessorInterface
     /** @var string */
     private $imageAttribute;
 
+    /**
+     * @var FilesystemInterface
+     */
+    private $filesystem;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * ImageAttributeProcessor constructor.
+     * @param FactoryInterface $productImageFactory
+     * @param RepositoryInterface $productImageRepository
+     * @param string $imageAttribute
+     * @param FilesystemInterface $filesystem
+     * @param LoggerInterface $logger
+     */
     public function __construct(
         FactoryInterface $productImageFactory,
         RepositoryInterface $productImageRepository,
-        string $imageAttribute
+        string $imageAttribute,
+        FilesystemInterface $filesystem,
+        LoggerInterface $logger
     ) {
         $this->productImageFactory = $productImageFactory;
         $this->productImageRepository = $productImageRepository;
         $this->imageAttribute = $imageAttribute;
+        $this->filesystem = $filesystem;
+        $this->logger = $logger;
     }
 
     /** {@inheritdoc} */
@@ -50,6 +74,7 @@ final class ImageAttributeProcessor implements AttributeProcessorInterface
             $currentImages,
             $compareImages
         );
+
         foreach ($productImageToAdd as $productImage) {
             $product->addImage($productImage);
         }
@@ -72,6 +97,12 @@ final class ImageAttributeProcessor implements AttributeProcessorInterface
                 $this->imageAttribute) === 0 && (null === $attribute->data() || is_string($attribute->data()));
     }
 
+    /**
+     * @param ProductInterface $product
+     * @param Attribute $attribute
+     * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     private function processImages(ProductInterface $product, Attribute $attribute): array
     {
         if (null === $attribute->data()) {
@@ -88,10 +119,45 @@ final class ImageAttributeProcessor implements AttributeProcessorInterface
         if (null === $productImage) {
             /** @var ProductImageInterface $productImage */
             $productImage = $this->productImageFactory->createNew();
-            $productImage->setType('akeneo');
-            $productImage->setPath($attribute->data());
         }
 
-        return [$productImage];
+        try {
+            $path = $this->persistAsset($attribute->data());
+            $productImage->setType('akeneo');
+            $productImage->setPath($path);
+
+            return [$productImage];
+        } catch (\Exception $e) {
+            $this->logger->debug(sprintf('Unable to persist asset "%s".', $attribute->data()));
+            return [];
+        }
+    }
+
+    /**
+     * @param string $imagePath
+     * @return string
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    private function persistAsset(string $imagePath): string
+    {
+        $path = 'http://192.168.115.31/media/show/' . urlencode(urlencode($imagePath)) . '/preview';
+
+        $client = new \GuzzleHttp\Client();
+        $response = $client->request('GET', $path);
+
+        $success = $this->filesystem->write(
+            $imagePath,
+            $response->getBody(),
+            true
+        );
+
+        if ($success === false) {
+            throw new \Exception(sprintf(
+                'Unable to persist asset: %s',
+                $path
+            ));
+        }
+
+        return $imagePath;
     }
 }

@@ -3,11 +3,11 @@ services:
         class: Sylake\SyliusConsumerPlugin\Denormalizer\AssetUpdatedDenormalizer
         public: true
         tags:
-            - { name: rabbitmq_simplebus.amqp_denormalizer }
+        - { name: rabbitmq_simplebus.amqp_denormalizer }
         arguments: ['@monolog.logger.queue']
     sylius_consumer_plugin.projector.asset:
         class: Sylake\SyliusConsumerPlugin\Projector\AssetProjector
         public: true
         tags:
-            - { name: event_subscriber, subscribes_to: Sylake\SyliusConsumerPlugin\Event\AssetUpdated, method: __invoke }
-        arguments: ['@cloudtec.sylius.asset.repository', '@monolog.logger.queue']
+        - { name: event_subscriber, subscribes_to: Sylake\SyliusConsumerPlugin\Event\AssetUpdated, method: __invoke }
+        arguments: ['@cloudtec.sylius.asset.repository', '@gaufrette.sylius_image_filesystem', '@monolog.logger.queue']

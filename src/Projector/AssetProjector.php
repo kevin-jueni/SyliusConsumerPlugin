@@ -44,6 +44,7 @@ final class AssetProjector
 
     /**
      * @param AssetUpdated $event
+     * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function __invoke(AssetUpdated $event)
@@ -59,43 +60,55 @@ final class AssetProjector
         }
 
         try {
+            $path = $this->persistAsset($event, $asset);
 
-            $path = $this->persistAsset($event);
-            $asset->setPath($path);
-
-            $asset->setType('akeneo');
-
-            $this->repository->add($asset);
+            if ($path !== null) {
+                $asset->setPath($path);
+                $asset->setType('akeneo');
+                $this->repository->add($asset);
+            } elseif ($path === null && $asset->getId()) {
+                $this->repository->remove($asset);
+            }
         } catch (\Exception $e) {
             $this->logger->debug(sprintf('Unable to persist asset "%s".', $event->getPath()));
+            return [];
         }
     }
 
     /**
      * @param AssetUpdated $event
-     * @return string
+     * @param Asset $asset
+     * @return string|null
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    private function persistAsset(AssetUpdated $event): string
+    private function persistAsset(AssetUpdated $event, Asset $asset): ?string
     {
-        $path = 'http://192.168.115.31/media/show/' . urlencode(urlencode($event->getPath())) . '/preview';
-
         $client = new \GuzzleHttp\Client();
-        $response = $client->request('GET', $path);
 
-        $success = $this->filesystem->write(
-            $event->getPath(),
-            $response->getBody(),
-            true
-        );
+        if ($event->getPath() === null && $asset->getId()) {
+            $this->filesystem->delete(
+                $asset->getPath()
+            );
 
-        if ($success === false) {
-            throw new \Exception(sprintf(
-                'Unable to persist asset: %s',
-                $path
-            ));
+            return null;
+        } else {
+            $path = 'http://192.168.115.31/media/show/' . urlencode(urlencode($event->getPath())) . '/preview';
+            $response = $client->request('GET', $path);
+
+            $success = $this->filesystem->write(
+                $event->getPath(),
+                $response->getBody(),
+                true
+            );
+
+            if ($success === false) {
+                throw new \Exception(sprintf(
+                    'Unable to persist asset: %s',
+                    $path
+                ));
+            }
+
+            return $event->getPath();
         }
-
-        return $event->getPath();
     }
 }

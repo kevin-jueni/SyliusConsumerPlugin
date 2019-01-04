@@ -18,9 +18,9 @@ final class AssetUpdated
 
     /**
      * @param string $code
-     * @param string $path
+     * @param string|null $path
      */
-    public function __construct(string $code, string $path)
+    public function __construct(string $code, ?string $path)
     {
         $this->code = $code;
         $this->path = $path;
@@ -35,9 +35,9 @@ final class AssetUpdated
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getPath(): string
+    public function getPath(): ?string
     {
         return $this->path;
     }

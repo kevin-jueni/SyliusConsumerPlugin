@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Sylake\SyliusConsumerPlugin\Denormalizer;
 
 use Sylake\SyliusConsumerPlugin\Event\AssetUpdated;
+use SyliusLabs\RabbitMqSimpleBusBundle\Denormalizer\DenormalizationFailedException;
 
 final class AssetUpdatedDenormalizer extends AkeneoDenormalizer
 {
@@ -18,10 +19,10 @@ final class AssetUpdatedDenormalizer extends AkeneoDenormalizer
                 json_encode($payload)));
         }
 
-        if (count($payload['variations'])) {
-            $path = $payload['variations'][0]['references'][0];
-        } else {
-            $path = $payload['references'][0];
+        $path = null;
+
+        if (array_key_exists('variations', $payload) && count($payload['variations'])) {
+            $path = $payload['variations'][0];
         }
 
         return new AssetUpdated($payload['code'], $path);

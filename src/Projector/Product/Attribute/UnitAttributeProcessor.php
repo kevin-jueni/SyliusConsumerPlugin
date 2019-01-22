@@ -7,15 +7,24 @@ namespace Sylake\SyliusConsumerPlugin\Projector\Product\Attribute;
 use Sylake\SyliusConsumerPlugin\Model\Attribute;
 use Sylius\Component\Attribute\Model\AttributeValueInterface;
 use Sylius\Component\Core\Model\ProductInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 final class UnitAttributeProcessor implements AttributeProcessorInterface
 {
     /** @var AttributeValueProviderInterface */
     private $attributeValueProvider;
 
-    public function __construct(AttributeValueProviderInterface $attributeValueProvider)
-    {
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    public function __construct(
+        AttributeValueProviderInterface $attributeValueProvider,
+        TranslatorInterface $translator
+    ) {
         $this->attributeValueProvider = $attributeValueProvider;
+        $this->translator = $translator;
     }
 
     /** {@inheritdoc} */
@@ -32,12 +41,18 @@ final class UnitAttributeProcessor implements AttributeProcessorInterface
         }
 
         /** @var AttributeValueInterface|null $attributeValue */
-        $attributeValue = $this->attributeValueProvider->provide($product, $attribute->attribute(), $attribute->locale());
+        $attributeValue = $this->attributeValueProvider->provide($product, $attribute->attribute(),
+            $attribute->locale());
         if (null === $attributeValue) {
             return [];
         }
 
-        $attributeValue->setValue(sprintf('%s %s', $data['amount'], $data['unit']));
+        $value = $this->formatValue($data['amount']);
+
+        $attributeValue->setValue(
+            $this->translator->trans('cloudtec.ui.' . strtolower($data['unit']), ['%value%' => $value], null,
+                $attribute->locale())
+        );
 
         return [$attributeValue];
     }
@@ -47,7 +62,20 @@ final class UnitAttributeProcessor implements AttributeProcessorInterface
         return is_array($attribute->data())
             && count($attribute->data()) === 2
             && array_key_exists('amount', $attribute->data())
-            && array_key_exists('unit', $attribute->data())
-        ;
+            && array_key_exists('unit', $attribute->data());
     }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    private function formatValue(string $value): string
+    {
+        return preg_replace(
+            '!\.?[0]{1,4}$!',
+            '',
+            $value
+        );
+    }
+
 }

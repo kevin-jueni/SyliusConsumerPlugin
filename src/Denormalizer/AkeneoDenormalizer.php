@@ -32,6 +32,7 @@ abstract class AkeneoDenormalizer implements DenormalizerInterface
         try {
             $this->denormalize($message);
         } catch (DenormalizationFailedException $exception) {
+            dump($exception);
             return false;
         }
 
@@ -54,7 +55,7 @@ abstract class AkeneoDenormalizer implements DenormalizerInterface
         }
 
         if ($this->getSupportedMessageType() !== $body['type']) {
-            throw new DenormalizationFailedException('Message type is not supported.');
+            return;
         }
 
         return $this->denormalizePayload($body['payload']);

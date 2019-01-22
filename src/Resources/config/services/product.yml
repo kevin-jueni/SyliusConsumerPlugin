@@ -2,7 +2,7 @@ services:
     sylake_sylius_consumer.projector.product.attribute_unit_processor:
         class: Sylake\SyliusConsumerPlugin\Projector\Product\Attribute\UnitAttributeProcessor
         public: false
-        arguments: ['@sylake_sylius_consumer.attribute.attribute_value_provider']
+        arguments: ['@sylake_sylius_consumer.attribute.attribute_value_provider', '@translator']
     sylake_sylius_consumer.projector.product.attribute_image_processor:
         class: Sylake\SyliusConsumerPlugin\Projector\Product\Attribute\ImageAttributeProcessor
         public: false

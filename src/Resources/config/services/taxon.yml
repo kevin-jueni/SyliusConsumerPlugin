@@ -4,10 +4,10 @@ services:
         public: true
         tags:
             - { name: rabbitmq_simplebus.amqp_denormalizer }
-        arguments: ['@monolog.logger.queue']
+        arguments: ['@monolog.logger']
     sylius_consumer_plugin.projector.taxon:
         class: Sylake\SyliusConsumerPlugin\Projector\TaxonProjector
         public: true
         tags:
             - { name: event_subscriber, subscribes_to: Sylake\SyliusConsumerPlugin\Event\TaxonUpdated, method: __invoke }
-        arguments: ['@sylius.factory.taxon', '@sylius.repository.taxon', '@sylius.generator.taxon_slug', '@monolog.logger.queue']
+        arguments: ['@sylius.factory.taxon', '@sylius.repository.taxon', '@sylius.generator.taxon_slug', '@monolog.logger']

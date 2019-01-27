@@ -60,6 +60,11 @@ final class SylakeSyliusConsumerExtension extends Extension implements PrependEx
                         'name' => 'sylake',
                     ],
                     'callback' => 'rabbitmq_simplebus.consumer',
+                    'qos_options' => [
+                        'prefetch_size' => 0,
+                        'prefetch_count' => 1,
+                        'global' => false,
+                    ],
                 ],
             ],
         ]);

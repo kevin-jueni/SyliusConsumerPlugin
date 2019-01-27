@@ -43,6 +43,10 @@ final class ProductTaxonProjector
      */
     private function handleMainTaxon(array $taxonCodes, ProductInterface $product): void
     {
+        $taxonCodes = array_filter($taxonCodes, function (string $taxonCode) {
+            return strpos($taxonCode, 'erp_') !== 0;
+        });
+
         $mainTaxonCode = array_reduce($taxonCodes, function (string $mainTaxonCode, string $taxonCode): string {
             return 0 === strpos($taxonCode, $mainTaxonCode) ? $taxonCode : $mainTaxonCode;
         }, current($taxonCodes));

@@ -4,10 +4,10 @@ services:
         public: true
         tags:
         - { name: rabbitmq_simplebus.amqp_denormalizer }
-        arguments: ['@monolog.logger.queue']
+        arguments: ['@monolog.logger']
     sylius_consumer_plugin.projector.asset:
         class: Sylake\SyliusConsumerPlugin\Projector\AssetProjector
         public: true
         tags:
         - { name: event_subscriber, subscribes_to: Sylake\SyliusConsumerPlugin\Event\AssetUpdated, method: __invoke }
-        arguments: ['@cloudtec.sylius.asset.repository', '@gaufrette.sylius_image_filesystem', '@monolog.logger.queue']
+        arguments: ['@cloudtec.sylius.asset.repository', '@gaufrette.sylius_image_filesystem', '@monolog.logger']

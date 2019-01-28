@@ -76,6 +76,10 @@ final class ProductUpdatedDenormalizer extends AkeneoDenormalizer
         return 'akeneo_product_updated';
     }
 
+    /**
+     * @param array $payload
+     * @return array
+     */
     private function getAssociations(array $payload): array
     {
         $associations = [];

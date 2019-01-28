@@ -4,10 +4,10 @@ services:
         public: true
         tags:
             - { name: rabbitmq_simplebus.amqp_denormalizer }
-        arguments: ['@monolog.logger']
+        arguments: ['@monolog.logger.queue']
     sylius_consumer_plugin.projector.attribute:
         class: Sylake\SyliusConsumerPlugin\Projector\AttributeProjector
         public: true
         tags:
             - { name: event_subscriber, subscribes_to: Sylake\SyliusConsumerPlugin\Event\AttributeUpdated, method: __invoke }
-        arguments: ['@sylius.factory.product_attribute', '@sylius.repository.product_attribute', '@sylius.registry.attribute_type', '@monolog.logger']
+        arguments: ['@sylius.factory.product_attribute', '@sylius.repository.product_attribute', '@sylius.registry.attribute_type', '@monolog.logger.queue']

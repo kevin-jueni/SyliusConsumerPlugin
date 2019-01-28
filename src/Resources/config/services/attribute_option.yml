@@ -9,13 +9,13 @@ services:
         public: true
         tags:
             - { name: rabbitmq_simplebus.amqp_denormalizer }
-        arguments: ['@monolog.logger']
+        arguments: ['@monolog.logger.queue']
     sylius_consumer_plugin.projector.attribute_option:
         class: Sylake\SyliusConsumerPlugin\Projector\AttributeOptionProjector
         public: true
         tags:
             - { name: event_subscriber, subscribes_to: Sylake\SyliusConsumerPlugin\Event\AttributeOptionUpdated, method: __invoke }
-        arguments: ['@sylake_sylius_consumer.repository.akeneo_attribute_option', '@monolog.logger']
+        arguments: ['@sylake_sylius_consumer.repository.akeneo_attribute_option', '@monolog.logger.queue']
     sylake_sylius_consumer.repository.akeneo_attribute_option:
         class: Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository
         public: true

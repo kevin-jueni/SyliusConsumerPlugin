@@ -38,7 +38,8 @@ final class StringCollectionAttributeProcessor implements AttributeProcessorInte
         }
 
         /** @var AttributeValueInterface|null $attributeValue */
-        $attributeValue = $this->attributeValueProvider->provide($product, $attribute->attribute(), $attribute->locale());
+        $attributeValue = $this->attributeValueProvider->provide($product, $attribute->attribute(),
+            $attribute->locale());
         if (null === $attributeValue) {
             return [];
         }
@@ -52,8 +53,10 @@ final class StringCollectionAttributeProcessor implements AttributeProcessorInte
 
     private function supports(Attribute $attribute): bool
     {
-        return is_array($attribute->data()) && array_reduce($attribute->data(), function (bool $accumulator, $value): bool {
-            return $accumulator && is_string($value) && !empty($value);
-        }, true);
+        return is_array($attribute->data()) && array_key_exists('unit',
+                $attribute->data()) === false && array_reduce($attribute->data(),
+                function (bool $accumulator, $value): bool {
+                    return $accumulator && is_string($value) && !empty($value);
+                }, true);
     }
 }

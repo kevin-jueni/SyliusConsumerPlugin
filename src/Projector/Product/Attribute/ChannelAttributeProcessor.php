@@ -77,7 +77,7 @@ final class ChannelAttributeProcessor implements AttributeProcessorInterface
         $channels = [];
 
         foreach ($attribute->data() as $price) {
-            if (null === $price['amount']) {
+            if (!$price['amount']) {
                 continue;
             }
 

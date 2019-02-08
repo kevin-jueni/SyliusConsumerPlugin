@@ -13,7 +13,7 @@ use Sylius\Component\Currency\Model\CurrencyInterface;
 use Sylius\Component\Resource\Factory\FactoryInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 
-final class ChannelPricingAttributeProcessor implements AttributeProcessorInterface
+final class ChannelOriginalPricingAttributeProcessor implements AttributeProcessorInterface
 {
     /** @var FactoryInterface */
     private $channelPricingFactory;
@@ -54,30 +54,7 @@ final class ChannelPricingAttributeProcessor implements AttributeProcessorInterf
         /** @var ProductVariantInterface $productVariant */
         $productVariant = current($product->getVariants()->slice(0, 1));
 
-        $currentChannelPricings = $productVariant->getChannelPricings()->toArray();
-        $processedChannelPricings = $this->processChannelPricings($attribute, $productVariant);
-
-        $compareChannelPricings = function (ChannelPricingInterface $a, ChannelPricingInterface $b): int {
-            return $a->getId() <=> $b->getId();
-        };
-
-        $productChannelPricingToAdd = array_udiff(
-            $processedChannelPricings,
-            $currentChannelPricings,
-            $compareChannelPricings
-        );
-        foreach ($productChannelPricingToAdd as $productChannelPricing) {
-            $productVariant->addChannelPricing($productChannelPricing);
-        }
-
-        $productChannelPricingToRemove = array_udiff(
-            $currentChannelPricings,
-            $processedChannelPricings,
-            $compareChannelPricings
-        );
-        foreach ($productChannelPricingToRemove as $productChannelPricing) {
-            $productVariant->removeChannelPricing($productChannelPricing);
-        }
+        $this->processChannelPricings($attribute, $productVariant);
 
         return [];
     }
@@ -110,15 +87,10 @@ final class ChannelPricingAttributeProcessor implements AttributeProcessorInterf
                     'channelCode' => $channel->getCode(),
                 ]);
 
-                if (null === $channelPricing) {
-                    $channelPricing = $this->channelPricingFactory->createNew();
-                    $channelPricing->setChannelCode($channel->getCode());
-                    $channelPricing->setProductVariant($productVariant);
+                if ($channelPricing) {
+                    $channelPricing->setOriginalPrice((int)($price['amount'] * 100));
+                    $channelPricings[] = $channelPricing;
                 }
-
-                $channelPricing->setPrice((int)($price['amount'] * 100));
-
-                $channelPricings[] = $channelPricing;
             }
         }
 

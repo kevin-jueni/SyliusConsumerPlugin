@@ -99,15 +99,17 @@ final class ProductUpdatedDenormalizer extends AkeneoDenormalizer
         $assets = [];
 
         if (array_key_exists('standard_images',
-                $payload['values']) === false || !is_array($payload['values']['standard_images'])) {
+                $payload['values']) === true && !is_array($payload['values']['standard_images'])) {
             throw new DenormalizationFailedException('Images should be an array.');
         }
 
-        foreach ($payload['values']['standard_images'] as $asset) {
-            $assets = array_merge(
-                $assets,
-                $asset['data']
-            );
+        if (array_key_exists('standard_images', $payload['values']) === true) {
+            foreach ($payload['values']['standard_images'] as $asset) {
+                $assets = array_merge(
+                    $assets,
+                    $asset['data']
+                );
+            }
         }
 
         return $assets;

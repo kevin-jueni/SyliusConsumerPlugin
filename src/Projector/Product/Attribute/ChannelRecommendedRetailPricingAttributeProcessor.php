@@ -13,7 +13,7 @@ use Sylius\Component\Currency\Model\CurrencyInterface;
 use Sylius\Component\Resource\Factory\FactoryInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 
-final class ChannelOriginalPricingAttributeProcessor implements AttributeProcessorInterface
+final class ChannelRecommendedRetailPricingAttributeProcessor implements AttributeProcessorInterface
 {
     /** @var FactoryInterface */
     private $channelPricingFactory;

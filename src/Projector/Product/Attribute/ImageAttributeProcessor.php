@@ -29,6 +29,11 @@ final class ImageAttributeProcessor implements AttributeProcessorInterface
     private $filesystem;
 
     /**
+     * @var string
+     */
+    private $basePath;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -39,6 +44,7 @@ final class ImageAttributeProcessor implements AttributeProcessorInterface
      * @param RepositoryInterface $productImageRepository
      * @param string $imageAttribute
      * @param FilesystemInterface $filesystem
+     * @param string $basePath
      * @param LoggerInterface $logger
      */
     public function __construct(
@@ -46,12 +52,14 @@ final class ImageAttributeProcessor implements AttributeProcessorInterface
         RepositoryInterface $productImageRepository,
         string $imageAttribute,
         FilesystemInterface $filesystem,
+        string $basePath,
         LoggerInterface $logger
     ) {
         $this->productImageFactory = $productImageFactory;
         $this->productImageRepository = $productImageRepository;
         $this->imageAttribute = $imageAttribute;
         $this->filesystem = $filesystem;
+        $this->basePath = $basePath;
         $this->logger = $logger;
     }
 
@@ -140,7 +148,9 @@ final class ImageAttributeProcessor implements AttributeProcessorInterface
      */
     private function persistAsset(string $imagePath): string
     {
-        $path = 'http://192.168.115.31/media/show/' . urlencode(urlencode($imagePath)) . '/preview';
+        $path = $this->basePath . urlencode(urlencode($imagePath)) . '/preview';
+
+        $this->logger->debug(sprintf('Persisting asset with path "%s".', $path));
 
         $client = new \GuzzleHttp\Client();
         $response = $client->request('GET', $path);

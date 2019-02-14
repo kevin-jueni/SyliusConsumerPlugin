@@ -31,6 +31,7 @@ final class Configuration implements ConfigurationInterface
             ->scalarNode('price_attribute')->defaultValue('price')->end()
             ->scalarNode('recommended_retail_price_attribute')->defaultValue('price')->end()
             ->scalarNode('image_attribute')->defaultValue('images')->end()
+            ->scalarNode('image_base_path')->end()
             ->end()
             ->end()
             ->end()

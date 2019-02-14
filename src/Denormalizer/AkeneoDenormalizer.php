@@ -29,14 +29,7 @@ abstract class AkeneoDenormalizer implements DenormalizerInterface
      */
     final public function supports(AMQPMessage $message): bool
     {
-        try {
-            $this->denormalize($message);
-        } catch (DenormalizationFailedException $exception) {
-            dump($exception);
-            return false;
-        }
-
-        return true;
+        return strpos($message->getBody(), $this->getSupportedMessageType()) !== false;
     }
 
     /**

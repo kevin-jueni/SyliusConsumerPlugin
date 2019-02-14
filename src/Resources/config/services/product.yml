@@ -6,7 +6,7 @@ services:
     sylake_sylius_consumer.projector.product.attribute_image_processor:
         class: Sylake\SyliusConsumerPlugin\Projector\Product\Attribute\ImageAttributeProcessor
         public: false
-        arguments: ['@sylius.factory.product_image', '@sylius.repository.product_image', '%sylake_sylius_consumer.denormalizer.product.image_attribute%', '@gaufrette.sylius_image_filesystem', '@monolog.logger.queue']
+        arguments: ['@sylius.factory.product_image', '@sylius.repository.product_image', '%sylake_sylius_consumer.denormalizer.product.image_attribute%', '@gaufrette.sylius_image_filesystem','%sylake_sylius_consumer.denormalizer.product.image_base_path%', '@monolog.logger.queue']
     sylake_sylius_consumer.projector.product.attribute_channel_pricing_projector:
         class: Sylake\SyliusConsumerPlugin\Projector\Product\Attribute\ChannelPricingAttributeProcessor
         public: false

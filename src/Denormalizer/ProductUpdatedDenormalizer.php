@@ -14,13 +14,13 @@ final class ProductUpdatedDenormalizer extends AkeneoDenormalizer
      */
     protected function denormalizePayload(array $payload): ProductUpdated
     {
-        if (!array_key_exists('identifier', $payload) || !is_string($payload['identifier'])) {
-            throw new DenormalizationFailedException('Identifier should be a string.');
-        }
-
         if ($this->logger) {
             $this->logger->debug(sprintf('Denormalizing product "%s" with the following payload: "%s"',
                 $payload['identifier'], json_encode($payload)));
+        }
+
+        if (!array_key_exists('identifier', $payload) || !is_string($payload['identifier'])) {
+            throw new DenormalizationFailedException('Identifier should be a string.');
         }
 
         $payload['enabled'] = $payload['enabled'] ?? false;
@@ -103,7 +103,7 @@ final class ProductUpdatedDenormalizer extends AkeneoDenormalizer
             throw new DenormalizationFailedException('Images should be an array.');
         }
 
-        if (array_key_exists('standard_images', $payload['values']) === true) {
+        if (array_key_exists('standard_images', $payload['values'])) {
             foreach ($payload['values']['standard_images'] as $asset) {
                 $assets = array_merge(
                     $assets,

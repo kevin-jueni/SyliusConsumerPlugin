@@ -27,21 +27,21 @@ final class ChannelPricingAttributeProcessor implements AttributeProcessorInterf
     /** @var RepositoryInterface */
     private $channelPricingRepository;
 
-    /** @var string */
-    private $priceAttribute;
+    /** @var string[] */
+    private $priceAttributes;
 
     public function __construct(
         FactoryInterface $channelPricingFactory,
         RepositoryInterface $channelRepository,
         RepositoryInterface $currencyRepository,
         RepositoryInterface $channelPricingRepository,
-        string $priceAttribute
+        array $priceAttributes
     ) {
         $this->channelPricingFactory = $channelPricingFactory;
         $this->channelRepository = $channelRepository;
         $this->currencyRepository = $currencyRepository;
         $this->channelPricingRepository = $channelPricingRepository;
-        $this->priceAttribute = $priceAttribute;
+        $this->priceAttributes = $priceAttributes;
     }
 
     /** {@inheritdoc} */
@@ -54,7 +54,22 @@ final class ChannelPricingAttributeProcessor implements AttributeProcessorInterf
         /** @var ProductVariantInterface $productVariant */
         $productVariant = current($product->getVariants()->slice(0, 1));
 
-        $currentChannelPricings = $productVariant->getChannelPricings()->toArray();
+        $channels = $this->channelRepository->findBy([
+            'erpPriceKey' => $attribute->attribute(),
+        ]);
+
+        $allChannelPricings = $productVariant->getChannelPricings()->toArray();
+        $currentChannelPricings = [];
+
+        foreach ($allChannelPricings as $pricing) {
+            foreach ($channels as $channel) {
+                if ($channel->getCode() === $pricing->getChannelCode()) {
+                    $currentChannelPricings[] = $pricing;
+                    break;
+                }
+            }
+        }
+
         $processedChannelPricings = $this->processChannelPricings($attribute, $productVariant);
 
         $compareChannelPricings = function (ChannelPricingInterface $a, ChannelPricingInterface $b): int {
@@ -84,7 +99,7 @@ final class ChannelPricingAttributeProcessor implements AttributeProcessorInterf
 
     private function supports(Attribute $attribute): bool
     {
-        return $this->priceAttribute === $attribute->attribute() && is_array($attribute->data());
+        return in_array($attribute->attribute(), $this->priceAttributes) && is_array($attribute->data());
     }
 
     private function processChannelPricings(Attribute $attribute, ProductVariantInterface $productVariant): array
@@ -93,7 +108,7 @@ final class ChannelPricingAttributeProcessor implements AttributeProcessorInterf
         $channelPricings = [];
 
         foreach ($attribute->data() as $price) {
-            if (!$price['amount']) {
+            if (!$price['amount'] || $price['amount'] === '0.00') {
                 continue;
             }
 
@@ -101,7 +116,10 @@ final class ChannelPricingAttributeProcessor implements AttributeProcessorInterf
             $currency = $this->currencyRepository->findOneBy(['code' => $price['currency']]);
 
             /** @var ChannelInterface[] $channels */
-            $channels = $this->channelRepository->findBy(['baseCurrency' => $currency]);
+            $channels = $this->channelRepository->findBy([
+                'baseCurrency' => $currency,
+                'erpPriceKey' => $attribute->attribute(),
+            ]);
 
             foreach ($channels as $channel) {
                 /** @var ChannelPricingInterface|null $channelPricing */

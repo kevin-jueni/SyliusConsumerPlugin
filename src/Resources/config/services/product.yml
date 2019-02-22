@@ -10,7 +10,7 @@ services:
     sylake_sylius_consumer.projector.product.attribute_channel_pricing_projector:
         class: Sylake\SyliusConsumerPlugin\Projector\Product\Attribute\ChannelPricingAttributeProcessor
         public: false
-        arguments: ['@sylius.factory.channel_pricing', '@sylius.repository.channel', '@sylius.repository.currency', '@sylius.repository.channel_pricing', '%sylake_sylius_consumer.denormalizer.product.price_attribute%']
+        arguments: ['@sylius.factory.channel_pricing', '@sylius.repository.channel', '@sylius.repository.currency', '@sylius.repository.channel_pricing', '%sylake_sylius_consumer.denormalizer.product.price_attributes%']
     sylake_sylius_consumer.projector.product.attribute_channel_recommended_retail_pricing_projector:
         class: Sylake\SyliusConsumerPlugin\Projector\Product\Attribute\ChannelRecommendedRetailPricingAttributeProcessor
         public: false
@@ -18,7 +18,7 @@ services:
     sylake_sylius_consumer.projector.product.attribute_channel_processor:
         class: Sylake\SyliusConsumerPlugin\Projector\Product\Attribute\ChannelAttributeProcessor
         public: false
-        arguments: ['@sylius.repository.channel', '@sylius.repository.currency', '%sylake_sylius_consumer.denormalizer.product.price_attribute%', '%sylake_sylius_consumer.denormalizer.product.recommended_retail_price_attribute%']
+        arguments: ['@sylius.repository.channel', '@sylius.repository.currency', '%sylake_sylius_consumer.denormalizer.product.price_attributes%', '%sylake_sylius_consumer.denormalizer.product.recommended_retail_price_attribute%']
     sylake_sylius_consumer.projector.product.attribute_description_processor:
         class: Sylake\SyliusConsumerPlugin\Projector\Product\Attribute\DescriptionAttributeProcessor
         public: false

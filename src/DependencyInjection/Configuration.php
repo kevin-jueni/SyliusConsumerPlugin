@@ -28,7 +28,7 @@ final class Configuration implements ConfigurationInterface
             ->children()
             ->scalarNode('name_attribute')->defaultValue('name')->end()
             ->scalarNode('description_attribute')->defaultValue('description')->end()
-            ->scalarNode('price_attribute')->defaultValue('price')->end()
+            ->arrayNode('price_attributes')->scalarPrototype()->end()->end()
             ->scalarNode('recommended_retail_price_attribute')->defaultValue('price')->end()
             ->scalarNode('image_attribute')->defaultValue('images')->end()
             ->scalarNode('image_base_path')->end()

@@ -18,17 +18,17 @@ final class ChannelAttributeProcessor implements AttributeProcessorInterface
     /** @var RepositoryInterface */
     private $currencyRepository;
 
-    /** @var string */
-    private $priceAttribute;
+    /** @var string[] */
+    private $priceAttributes;
 
     public function __construct(
         RepositoryInterface $channelRepository,
         RepositoryInterface $currencyRepository,
-        string $priceAttribute
+        array $priceAttributes
     ) {
         $this->channelRepository = $channelRepository;
         $this->currencyRepository = $currencyRepository;
-        $this->priceAttribute = $priceAttribute;
+        $this->priceAttributes = $priceAttributes;
     }
 
     /** {@inheritdoc} */
@@ -68,7 +68,7 @@ final class ChannelAttributeProcessor implements AttributeProcessorInterface
 
     private function supports(Attribute $attribute): bool
     {
-        return $this->priceAttribute === $attribute->attribute() && is_array($attribute->data());
+        return in_array($attribute->attribute(), $this->priceAttributes) && is_array($attribute->data());
     }
 
     private function processChannels(Attribute $attribute): array
@@ -86,7 +86,10 @@ final class ChannelAttributeProcessor implements AttributeProcessorInterface
 
             $channels = array_unique(array_merge(
                 $channels,
-                $this->channelRepository->findBy(['baseCurrency' => $currency])
+                $this->channelRepository->findBy([
+                    'baseCurrency' => $currency,
+                    'erpPriceKey' => $attribute->attribute()
+                ])
             ));
         }
 

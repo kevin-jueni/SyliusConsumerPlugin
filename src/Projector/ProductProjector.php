@@ -121,7 +121,8 @@ final class ProductProjector
 
     private function handleEnabled(bool $enabled, ProductInterface $product): void
     {
-        $product->setEnabled($enabled);
+        $enabledInErp = $product->getAttributeByCodeAndLocale('erp_shop', 'de_CH');
+        $product->setEnabled($enabled && $enabledInErp && $enabledInErp->getValue() === true);
     }
 
     private function handleCreatedAt(\DateTime $createdAt, ProductInterface $product): void
